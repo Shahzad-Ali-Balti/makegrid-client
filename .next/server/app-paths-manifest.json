@@ -1,8 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/(private)/dashboard/page": "app/(private)/dashboard/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(private)/workspace/page": "app/(private)/workspace/page.js",
-  "/(private)/my-assets/page": "app/(private)/my-assets/page.js"
-}
