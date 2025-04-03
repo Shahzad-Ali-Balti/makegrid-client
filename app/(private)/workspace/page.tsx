@@ -50,7 +50,7 @@ const ImageTo3DPage = () => {
     const [myGenerationsPanelSize, setMyGenerationsPanelSize] = useState(LEFT_PANEL_DEFAULT_SIZE)
     const [modelPreviewPanelSize, setModelPreviewPanelSize] = useState(MODEL_PREVIEW_PANEL_DEFAULT_SIZE)
     const [promptPanelSize, setPromptPanelSize] = useState(PROMPT_PANEL_DEFAULT_SIZE)
-    const [prompt,setPrompt]=useState("")
+    // const [prompt,setPrompt]=useState("")
     return (
         <>
             <PageHeader title="Workspace"/>
