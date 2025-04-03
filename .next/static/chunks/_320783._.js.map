@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://C%3A/CTB-MSB/All%20Projects/Live%20Projects/ai-3d-generator/ai-3d-generator/ai-3d-generator-webapp/app/page.tsx"],"sourcesContent":["\"use client\"\nimport {useEffect} from \"react\";\nimport {useRouter} from \"next/navigation\";\n\nexport default function Home() {\n    const router = useRouter();\n\n    useEffect(() => {\n        router.replace(\"/dashboard\")\n    }, []);\n\n    return (\n        <div>\n\n        </div>\n    );\n}\n"],"names":[],"mappings":";;;;AACA;AACA;;;AAFA;;;AAIe,SAAS;;IACpB,MAAM,SAAS,CAAA,GAAA,qIAAA,CAAA,YAAS,AAAD;IAEvB,CAAA,GAAA,6JAAA,CAAA,YAAS,AAAD;0BAAE;YACN,OAAO,OAAO,CAAC;QACnB;yBAAG,EAAE;IAEL,qBACI,6LAAC;;;;;AAIT;GAZwB;;QACL,qIAAA,CAAA,YAAS;;;KADJ"}},
+    {"offset": {"line": 43, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
+    {"offset": {"line": 53, "column": 0}, "map": {"version":3,"sources":["file://C%3A/CTB-MSB/All%20Projects/Live%20Projects/ai-3d-generator/ai-3d-generator/ai-3d-generator-webapp/node_modules/next/navigation.js"],"sourcesContent":["module.exports = require('./dist/client/components/navigation')\n"],"names":[],"mappings":"AAAA,OAAO,OAAO","ignoreList":[0]}},
+    {"offset": {"line": 54, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
