@@ -201,7 +201,7 @@ const ModelPreviewPanel = ({panelSize}: { panelSize: number }) => {
             {/*</p>*/}
             {/*<img src={canvas.src} alt="canvas"*/}
             {/*     className="h-full w-full object-cover"/>*/}
-            <ModelViewer height="h-[calc(100vh-140px)]" modelPath="/Lion.glb"/>
+            <ModelViewer height="h-[calc(100vh-140px)]" modelPath="/lion.glb"/>
         </div>
     )
 }
