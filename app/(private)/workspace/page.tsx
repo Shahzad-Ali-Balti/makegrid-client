@@ -42,7 +42,7 @@ import {Label} from "@/components/ui/label"
 import {Card, CardContent, CardHeader} from "@/components/ui/card"
 import promptImagePlaceholder from "@/assets/placeholder 1.png"
 import ModelViewer from "@/components/canvas/model-viewer"
-import {string} from "zod"
+// import {string} from "zod"
 
 const LEFT_PANEL_DEFAULT_SIZE = 25
 const MODEL_PREVIEW_PANEL_DEFAULT_SIZE = 60
