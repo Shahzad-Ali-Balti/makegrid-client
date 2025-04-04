@@ -1,7 +1,7 @@
 "use client"
 import React, {useState} from "react"
 import PageHeader from "@/components/page-header/page-header"
-import axiosInstance from "@/utils/axiosInstance"
+import {axiosInstance} from "@/utils/axiosInstance"
 import {
   ResizableHandle,
   ResizablePanel,
