@@ -1,6 +1,7 @@
 "use client"
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PageHeader from "@/components/page-header/page-header";
+import {axiosInstance} from "@/utils/axiosInstance"
 import {
     ResizableHandle,
     ResizablePanel,
@@ -51,6 +52,7 @@ const ImageTo3DPage = () => {
     const [modelPreviewPanelSize, setModelPreviewPanelSize] = useState(MODEL_PREVIEW_PANEL_DEFAULT_SIZE)
     const [promptPanelSize, setPromptPanelSize] = useState(PROMPT_PANEL_DEFAULT_SIZE)
     // const [prompt,setPrompt]=useState("")
+
     return (
         <>
             <PageHeader title="Workspace"/>
@@ -201,7 +203,7 @@ const ModelPreviewPanel = ({panelSize}: { panelSize: number }) => {
             {/*</p>*/}
             {/*<img src={canvas.src} alt="canvas"*/}
             {/*     className="h-full w-full object-cover"/>*/}
-            <ModelViewer height="h-[calc(100vh-140px)]" modelPath="/lion.glb"/>
+            <ModelViewer height="h-[calc(100vh-140px)]" modelPath="/dummy.glb"/>
         </div>
     )
 }
