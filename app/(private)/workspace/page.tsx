@@ -61,7 +61,7 @@ const ImageTo3DPage = () => {
   const [prompt, setPrompt] = useState("")
   const [filePath, setFilePath] = useState<string | null>('/models/model_1743722687995.glb')
   const [loading, setLoading] = useState(false)
-  const baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://server-makegrid-3d-production.up.railway.app';
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return
