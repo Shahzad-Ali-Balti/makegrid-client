@@ -62,6 +62,7 @@ const ImageTo3DPage = () => {
   const [filePath, setFilePath] = useState<string | null>('/models/model_1743722687995.glb')
   const [loading, setLoading] = useState(false)
   const baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://server-makegrid-3d-production.up.railway.app';
+  // const baseURL: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return
@@ -84,6 +85,7 @@ const ImageTo3DPage = () => {
       setLoading(false)
     }
   }
+
 
   return (
     <>
@@ -258,6 +260,7 @@ const ModelPreviewPanel = ({
     baseURL:string | null
   })  => {
   console.log(panelSize)
+  console.log("path : ",modelPath)
   return (
     <div className="flex items-center justify-center text-center bg-muted h-[calc(100vh-140px)]">
       {/*<p className="text-xs font-medium text-muted-foreground">*/}
