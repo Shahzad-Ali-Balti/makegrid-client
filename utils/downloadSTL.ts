@@ -26,7 +26,6 @@ export const getSTLFilename = (prefix = "model") => {
     return `${prefix}_${randomStr}.glb`
   }
 
-
 export const downloadGLB = async (glbUrl: string, filename?: string) => {
     try {
       const response = await fetch(glbUrl)
