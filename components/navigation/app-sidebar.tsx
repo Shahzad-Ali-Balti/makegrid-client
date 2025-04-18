@@ -142,6 +142,12 @@ const data = {
                 },
             ],
         },
+        {
+            title: "Inbox",
+            url: "/inbox",
+            icon: HomeIcon,
+            isActive: true,
+        }
     ],
 }
 
