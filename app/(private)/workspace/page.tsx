@@ -1,7 +1,7 @@
 "use client"
 import React, {useState} from "react"
 import PageHeader from "@/components/page-header/page-header"
-import {axiosInstance} from "@/utils/axiosInstance"
+import axiosInstance from "@/utils/axiosInstance"
 import {
   ResizableHandle,
   ResizablePanel,
@@ -42,11 +42,24 @@ import {Label} from "@/components/ui/label"
 import {Card, CardContent, CardHeader} from "@/components/ui/card"
 import promptImagePlaceholder from "@/assets/placeholder 1.png"
 import ModelViewer from "@/components/canvas/model-viewer"
+import ModelViewerSmall from "@/components/canvas/model-viewer-small"
 // import {string} from "zod"
 
 const LEFT_PANEL_DEFAULT_SIZE = 25
 const MODEL_PREVIEW_PANEL_DEFAULT_SIZE = 60
 const PROMPT_PANEL_DEFAULT_SIZE = 25
+
+interface Asset {
+  id: string
+  model_url: string
+  prompt: string
+}
+
+interface SelectedModel {
+  id: string
+  prompt: string
+  model_url: string
+}
 
 const ImageTo3DPage = () => {
   const [myGenerationsPanelSize, setMyGenerationsPanelSize] = useState(
@@ -59,23 +72,84 @@ const ImageTo3DPage = () => {
     PROMPT_PANEL_DEFAULT_SIZE
   )
   const [prompt, setPrompt] = useState("")
-  const [filePath, setFilePath] = useState<string | null>('/models/model_1743722687995.glb')
+  const [filePath, setFilePath] = useState<string | null>(
+    "/media/assets/model_1743722687995.glb"
+  )
   const [loading, setLoading] = useState(false)
-  const baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://server-makegrid-3d-production.up.railway.app';
+  const baseURL: string =
+    process.env.NEXT_PUBLIC_API_URL_2 || "http://localhost:8001"
   // const baseURL: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+  const [image, setImage] = useState<File | null>(null) // State for the uploaded image
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null) // State for image preview URL
+  const [error, setError] = useState<string | null>(null) // Error message if the wrong file is uploaded
+  const [assets, setAssets] = useState<Asset[]>([
+    {
+      id: "1",
+      model_url: "/media/assets/model_1743722687995.glb",
+      prompt: "Lion",
+    },
+  ])
+  const [selectedModel, setSelectedModel] = useState<SelectedModel | null>(null)
+  // Handle image file change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+      setImage(file)
+      setPreviewUrl(URL.createObjectURL(file)) // Create a preview URL for the image
+      setError(null) // Clear any previous errors
+    } else {
+      setError("Please upload a valid JPEG or PNG image.")
+    }
+  }
+  const handleImageToGenerate = async () => {
+    if (!image) {
+      setError("Please upload an image before generating.")
+      return
+    }
+
+    setLoading(true)
+    const formData = new FormData()
+    formData.append("image", image) // Append the image file to FormData
+
+    try {
+      const response = await axiosInstance.post(
+        "api/makers/image-to-model",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Ensure the request is sent as FormData
+          },
+        }
+      )
+
+      if (response.data.success) {
+        setFilePath(response.data.modelUrl) // Assuming the backend returns the model URL
+        console.log("✅ Model path saved:", response.data.modelUrl)
+      } else {
+        console.error("❌ Generation failed:", response.data.error)
+        setError("Failed to generate model from image.")
+      }
+    } catch (error) {
+      console.error("❌ API error:", error)
+      setError("An error occurred while generating the model.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return
 
     setLoading(true)
     try {
-      const response = await axiosInstance.post("/api/model/text-to-model", {
+      const response = await axiosInstance.post("/api/makers/text-to-model/", {
         prompt,
       })
 
       if (response.data.success) {
-        setFilePath(response.data.modelUrl)
-        console.log("✅ Model path saved:", response.data.modelUrl)
+        setFilePath(response.data.model_file)
+        console.log("✅ Model path saved:", response.data.model_file)
       } else {
         console.error("❌ Generation failed:", response.data.error)
       }
@@ -85,7 +159,6 @@ const ImageTo3DPage = () => {
       setLoading(false)
     }
   }
-
 
   return (
     <>
@@ -102,7 +175,12 @@ const ImageTo3DPage = () => {
             maxSize={100}
           >
             {myGenerationsPanelSize > 17 ? (
-              <MyGenerationsPanel panelSize={myGenerationsPanelSize} />
+              // <MyGenerationsPanel
+              //   panelSize={myGenerationsPanelSize}
+              //   assets={assets}
+              //   selectModel={setSelectedModel}
+              // />
+              <> </>
             ) : (
               <div className="flex items-center justify-center text-center bg-muted h-[calc(100vh-140px)]">
                 <p className="text-xs font-medium text-muted-foreground">
@@ -120,8 +198,12 @@ const ImageTo3DPage = () => {
             defaultSize={MODEL_PREVIEW_PANEL_DEFAULT_SIZE}
             minSize={0}
           >
-            {modelPreviewPanelSize > 10 ? (
-              <ModelPreviewPanel panelSize={modelPreviewPanelSize} modelPath={filePath} baseURL={baseURL}/>
+            { true ? (
+              <ModelPreviewPanel
+                panelSize={modelPreviewPanelSize}
+                modelPath={filePath}
+                baseURL={baseURL}
+              />
             ) : (
               <div className="flex items-center justify-center text-center bg-muted h-[calc(100vh-140px)]">
                 <p className="text-xs font-medium text-muted-foreground">
@@ -146,6 +228,10 @@ const ImageTo3DPage = () => {
                 setPrompt={setPrompt}
                 loading={loading}
                 onGenerate={handleGenerate}
+                onImageGenerate={handleImageToGenerate}
+                handleFileChange={handleFileChange} // Pass handleFileChange
+                previewUrl={previewUrl} // Pass previewUrl
+                error={error}
               />
             ) : (
               <div className="flex items-center justify-center text-center bg-muted h-[calc(100vh-140px)]">
@@ -162,16 +248,24 @@ const ImageTo3DPage = () => {
 }
 
 const PromptPanel = ({
-    prompt,
-    setPrompt,
-    loading,
-    onGenerate,
-  }: {
-    prompt: string
-    setPrompt: (val: string) => void
-    loading: boolean
-    onGenerate: () => void
-  }) => {
+  prompt,
+  setPrompt,
+  loading,
+  onGenerate,
+  onImageGenerate,
+  handleFileChange,
+  previewUrl,
+  error,
+}: {
+  prompt: string
+  setPrompt: (val: string) => void
+  loading: boolean
+  onGenerate: () => void
+  onImageGenerate: () => void
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void // Corrected the type here
+  previewUrl: string | null
+  error: string | null
+}) => {
   return (
     <ScrollArea className="h-[calc(100vh-140px)]">
       <div className="flex flex-col p-4 gap-4">
@@ -225,20 +319,42 @@ const PromptPanel = ({
               <TabsContent value="image">
                 <div className="flex flex-col gap-4 pt-2">
                   <div className="grid w-full gap-2">
-                    <Label htmlFor="picture">Picture</Label>
-                    <Input type="file" id="picture" />
+                    <Label htmlFor="picture">Upload Image</Label>
+                    <Input
+                      type="file"
+                      id="picture"
+                      accept="image/jpeg, image/png"
+                      onChange={handleFileChange}
+                    />
                   </div>
+
                   <div>
                     <AspectRatio ratio={1 / 1}>
-                      <img
-                        src={promptImagePlaceholder.src}
-                        className="w-full h-full object-cover rounded-xl"
-                      />
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="Image Preview"
+                          className="w-full h-full object-cover rounded-xl"
+                        />
+                      ) : (
+                        <img
+                          src={promptImagePlaceholder.src}
+                          alt="Placeholder"
+                          className="w-full h-full object-cover rounded-xl"
+                        />
+                      )}
                     </AspectRatio>
                   </div>
-                  <Button className="w-full">
+
+                  {error && <p className="text-red-500">{error}</p>}
+
+                  <Button
+                    className="w-full"
+                    onClick={onImageGenerate}
+                    disabled={loading}
+                  >
                     <SparklesIcon />
-                    Generate
+                    {loading ? "Generating" : "Upload and Generate"}
                   </Button>
                 </div>
               </TabsContent>
@@ -251,101 +367,74 @@ const PromptPanel = ({
 }
 
 const ModelPreviewPanel = ({
-    panelSize,
-    modelPath,
-    baseURL
-  }: {
-    panelSize: number
-    modelPath: string | null
-    baseURL:string | null
-  })  => {
-  console.log(panelSize)
-  console.log("path : ",modelPath)
+  panelSize,
+  modelPath,
+  baseURL,
+}: {
+  panelSize: number
+  modelPath: string | null
+  baseURL: string | null
+}) => {
+  const fullPath =
+    baseURL && modelPath
+      ? `${baseURL.replace(/\/$/, "")}/${modelPath.replace(/^\//, "")}`
+      : ""
+  const dummyPath = `${baseURL}/media/assets/model_1743722687995.glb`
+
   return (
     <div className="flex items-center justify-center text-center bg-muted h-[calc(100vh-140px)]">
-      {/*<p className="text-xs font-medium text-muted-foreground">*/}
-      {/*    Please select a model to continue.*/}
-      {/*</p>*/}
-      {/*<img src={canvas.src} alt="canvas"*/}
-      {/*     className="h-full w-full object-cover"/>*/}
-      <ModelViewer
-        height="h-[calc(100vh-140px)]"
-        modelPath={`${baseURL}${modelPath}`}
-      />
+      {fullPath ? (
+        <ModelViewer height="h-[calc(100vh-140px)]" modelPath={fullPath} />
+      ) : (
+        <p className="text-xs font-medium text-muted-foreground">
+        <ModelViewer height="h-[calc(100vh-140px)]" modelPath={dummyPath} />
+        </p>
+      )}
     </div>
   )
 }
 
-const MyGenerationsPanel = ({panelSize}: {panelSize: number}) => {
+const MyGenerationsPanel = ({
+  panelSize,
+  assets,
+  selectModel,
+}: {
+  panelSize: number
+  assets: Asset[]
+  selectModel: (model: SelectedModel) => void
+}) => {
   return (
-    <ScrollArea className="h-[calc(100vh-140px)]">
-      <div className="px-4 pt-4 pb-2">
-        <Input type="search" placeholder="Search" />
-      </div>
-      <div className="flex flex-wrap justify-between px-4 py-2">
-        <div className="flex gap-2">
-          <ToggleGroup type="single">
-            <ToggleGroupItem value="folder" aria-label="Toggle bold">
-              <FolderIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="italic" aria-label="Toggle italic">
-              <Grid2X2Icon />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <ToggleGroup type="single">
-            <ToggleGroupItem title="All" value="all" aria-label="Toggle bold">
-              <GripIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              title="Models"
-              value="models"
-              aria-label="Toggle italic"
-            >
-              <BoxIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              title="Texture"
-              value="texture"
-              aria-label="Toggle italic"
-            >
-              <PaintbrushIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              title="Animations"
-              value="animations"
-              aria-label="Toggle italic"
-            >
-              <WandSparklesIcon />
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-        <div className="flex">
-          <FiltersMenu />
-          <Tooltip text="Show all assets">
-            <Button size="icon" variant="ghost">
-              <ExpandIcon />
-            </Button>
-          </Tooltip>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4 px-4 py-2">
-        <MyGenerationSection panelSize={panelSize} />
-        <MyGenerationSection panelSize={panelSize} />
-        <MyGenerationSection panelSize={panelSize} />
-      </div>
-    </ScrollArea>
+    <div className="flex flex-col gap-4 px-4 py-2">
+      {assets.map(asset => (
+        <MyGenerationSection
+          key={asset.id}
+          panelSize={panelSize}
+          assets={[asset]} // render one section per asset
+          onSelect={selectModel} // ✅ use selectModel prop
+        />
+      ))}
+    </div>
   )
 }
 
-const MyGenerationSection = ({panelSize}: {panelSize: number}) => {
+const MyGenerationSection = ({
+  panelSize,
+  assets,
+  onSelect,
+}: {
+  panelSize: number
+  assets: Asset[]
+  onSelect: (model: SelectedModel) => void
+}) => {
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between gap-1">
-        <p className="text-sm line-clamp-1 ">
-          A very long prompt used to generate the model
+        <p className="text-sm line-clamp-1">
+          {/* {assets[0]?.prompt || "No prompt"} */}
         </p>
+
         <Button variant="ghost" size="sm">
-          All 2 assets
+          All {assets.length || 0} Assets
           <PlayIcon
             className="fill-foreground"
             style={{height: "0.5rem", width: "0.5rem"}}
@@ -364,58 +453,47 @@ const MyGenerationSection = ({panelSize}: {panelSize: number}) => {
             : "grid-cols-1"
         )}
       >
-        <MyGenerationCard />
-        <MyGenerationCard />
-        <MyGenerationCard />
+        {assets.map(asset => (
+          <MyGenerationCard key={asset.id} asset={asset} onSelect={onSelect} />
+        ))}
       </div>
     </div>
   )
 }
 
-const MyGenerationCard = () => {
+//
+const MyGenerationCard = ({
+  asset,
+  onSelect,
+}: {
+  asset: Asset
+  onSelect: (model: SelectedModel) => void
+}) => {
+  const baseURL = process.env.NEXT_PUBLIC_API_URL_2 || "http://localhost:8001"
+
+  const fullPath =
+    baseURL && asset.model_url
+      ? `${baseURL.replace(/\/$/, "")}/${asset.model_url.replace(/^\//, "")}`
+      : ""
   return (
-    <div className="flex flex-col gap-2">
-      <div className="bg-muted cursor-pointer rounded-xl max-h-56 max-w-56 border-2 border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary grid grid-rows-2 gap-1 transition-all duration-200 p-1 overflow-hidden">
-        <div className="grid grid-cols-2 gap-1">
-          <AspectRatio className="bg-muted">
-            <Image
-              src={image1.src}
-              fill
-              alt="Image"
-              className="h-full w-full rounded-md object-cover"
-            />
-          </AspectRatio>
-          <AspectRatio className="bg-muted">
-            <Image
-              src={image1.src}
-              fill
-              alt="Image"
-              className="h-full w-full rounded-md object-cover"
-            />
-          </AspectRatio>
-        </div>
-        <div className="grid grid-cols-2 gap-1">
-          <AspectRatio className="bg-muted">
-            <Image
-              src={image1.src}
-              fill
-              alt="Image"
-              className="h-full w-full rounded-md object-cover"
-            />
-          </AspectRatio>
-          <AspectRatio className="bg-muted">
-            <Image
-              src={image1.src}
-              fill
-              alt="Image"
-              className="h-full w-full rounded-md object-cover"
-            />
-          </AspectRatio>
-        </div>
+    <div
+      className="flex flex-col gap-2 cursor-pointer"
+      onClick={() =>
+        onSelect({
+          id: asset.id,
+          prompt: asset.prompt,
+          model_url: asset.model_url, // This must be available in `asset`
+        })
+      }
+    >
+      <div className="bg-muted rounded-xl max-h-56 max-w-56 border hover:border-primary p-1 overflow-hidden transition-all duration-200">
+        {/* <AspectRatio className="bg-muted"> */}
+        <ModelViewerSmall height="h-auto" modelPath={`http://localhost:8001/media/assets/model_1743722687995.glb`} />
+        {/* </AspectRatio> */}
       </div>
-      {/*<Button className="w-full">*/}
-      {/*    Publish*/}
-      {/*</Button>*/}
+      <Button className="w-full" variant="secondary">
+        Publish
+      </Button>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
-import placeholderImage from "@/assets/register-graphic.jpg"
+import placeholderImage from "@/assets/logo_2.jpg"
 import {z} from "zod"
 import {SubmitHandler, useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {axiosInstance} from "@/utils/axiosInstance"
+import axiosInstance from "@/utils/axiosInstance"
 import {useToast} from "@/hooks/use-toast"
 import {useState} from "react"
 import {useRouter} from "next/navigation"

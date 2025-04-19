@@ -3,7 +3,7 @@ import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
-import placeholderImage from "@/assets/login-graphic.jpg"
+import placeholderImage from "@/assets/logo.jpg"
 import * as motion from "motion/react-client"
 import {z} from "zod"
 import {SubmitHandler, useForm} from "react-hook-form"
@@ -11,7 +11,8 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useState} from "react"
 import {useToast} from "@/hooks/use-toast"
 import {useRouter} from "next/navigation"
-import {axiosInstance} from "@/utils/axiosInstance"
+import axiosInstance from "@/utils/axiosInstance"
+import {useAuth} from "@/hooks/use-auth"
 import {
   Form,
   FormControl,
@@ -40,30 +41,37 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
     },
   })
   const [isLoading, setIsLoading] = useState(false)
+  const {login} = useAuth()
 
   const {toast} = useToast()
   const router = useRouter()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async data => {
-    console.log(data)
     try {
       setIsLoading(true)
-      const res = await axiosInstance.post("/api/accounts/login/", data)
-      console.log(res)
-      setIsLoading(false)
-      setTimeout(() => {
-        router.push("/")
-      }, 3000)
+      const res = await axiosInstance.post("/api/accounts/login/", data, {
+        withCredentials: true
+      })
+
+      const accessToken = res.data.access
+      const user = res.data.user
+
+      login(user, accessToken)
+
+      toast({title: "Login successful!"})
+      router.push("/")
     } catch (e) {
-      console.log(e)
-      setIsLoading(false)
+      console.error(e)
       toast({
-        title: "An error occurred.",
-        description: "Please try again later.",
+        title: "Login failed.",
+        description: "Please check your credentials.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(false)
     }
   }
+
   return (
     <motion.div
       animate={{opacity: 1, scale: 1}}
@@ -85,7 +93,7 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
                       Login to your Acme Inc account
                     </p>
                   </div>
-                  
+
                   <div className="grid gap-2">
                     <FormField
                       control={form.control}

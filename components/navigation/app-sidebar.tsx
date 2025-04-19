@@ -20,6 +20,7 @@ import {
     UserRoundIcon,
     UsersRoundIcon,
     ZapIcon,
+    InboxIcon
 } from "lucide-react"
 
 import {NavMain} from "@/components/navigation/nav-main"
@@ -31,7 +32,9 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import logo from "@/assets/makegrid-logo.png";
+// import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo-removebg-preview.png"
+
 // This is sample data.
 const data = {
     user: {
@@ -145,7 +148,7 @@ const data = {
         {
             title: "Inbox",
             url: "/inbox",
-            icon: HomeIcon,
+            icon: InboxIcon,
             isActive: true,
         }
     ],

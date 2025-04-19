@@ -1,36 +1,36 @@
-import type {Metadata} from "next";
-import "./globals.css";
-import {Toaster} from "@/components/ui/toaster";
-import {ThemeProvider} from "@/components/navigation/theme-provider";
-import {Inter} from "next/font/google";
+import type {Metadata} from "next"
+import "./globals.css"
+import {Toaster} from "@/components/ui/toaster"
+import {ThemeProvider} from "@/components/navigation/theme-provider"
+import {Inter} from "next/font/google"
+import { AuthProvider } from "@/context/authContext"
 
-const inter = Inter({subsets: ["latin"]});
+const inter = Inter({subsets: ["latin"]})
 
 export const metadata: Metadata = {
-    title: "Makegrid",
-    description: "Makegrid",
-};
+  title: "Makegrid",
+  description: "Makegrid",
+}
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
-    children: React.ReactNode;
+  children,
+}: Readonly<{
+  children: React.ReactNode
 }>) {
-    return (
-        <html lang="en" className='overflow-hidden'>
-        <body
-            className={`${inter.className} antialiased`}
-        >
+  return (
+    <html lang="en" className="overflow-hidden">
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-            {children}
-            <Toaster/>
+          <AuthProvider>{children}</AuthProvider>
+
+          <Toaster />
         </ThemeProvider>
-        </body>
-        </html>
-    );
+      </body>
+    </html>
+  )
 }
